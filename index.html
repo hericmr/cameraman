@@ -1,16 +1,19 @@
-<html lang="pt-BR">
+<!DOCTYPE html>
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>El Vigilante Santos</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="<KEY>" crossorigin="anonymous">
-    <title>Héric Stream</title>
+
 </head>
-<body class="text-center">
-    <div class="container">
-        <div class="jumbotron">
-            <h1 class="display-4">Heric Stream</h1>
-            <img src="{{ url_for('video_feed') }}" width="640" height="480" />
-        </div>
-    </div>
+<body>
+    <h1>EL Vigilante - Héric Moura's Final Project _- CS50Python</h1>
+    <h2>Choose the location</h2>
+    <ul>
+        {% for camera_id, camera in cameras.items() %}
+            <li><a href="{{ url_for('view', camera_id=camera_id) }}">{{ camera["lugar"] }}</a></li>
+        {% endfor %}
+    </ul>
 </body>
 </html>
