@@ -1,8 +1,50 @@
-:root {
-  background-color: #242424;
-}
-
-body, html, div {
+/* Reset básico */
+body, html {
   margin: 0;
   padding: 0;
+  height: 100%;
+  font-family: 'Roboto', sans-serif;
+  background-color: #1e1e2f;
+  color: #ffffff;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Flexbox no container principal */
+#root {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+}
+
+/* Corpo do conteúdo */
+main {
+  flex: 1; /* O conteúdo principal ocupa o espaço restante */
+  padding: 20px;
+}
+
+/* Estilização do rodapé */
+footer {
+  background-color: #111122;
+  text-align: center;
+  font-size: 14px;
+  padding: 20px;
+  border-top: 1px solid #333;
+}
+
+footer p {
+  margin: 5px 0;
+}
+
+footer a {
+  color: #61dafb;
+  text-decoration: none;
+  transition: color 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+footer a:hover {
+  color: #21a1f1;
 }
