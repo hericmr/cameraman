@@ -24,7 +24,7 @@ const Camera = () => {
   
 
   const BASE_IMAGE_URL =
-    "https://egov.santos.sp.gov.br/santosmapeada/css/img/cameras/cam1472/snap_c1.jpg?";
+    "https://egov.santos.sp.gov.br/santosmapeada/css/img/cameras/cam0443/snap_c1.jpg?";
 
   useEffect(() => {
     workerRef.current = new Worker(
@@ -33,6 +33,7 @@ const Camera = () => {
     );
 
     workerRef.current.onmessage = (event) => {
+      
       const { status, output, error } = event.data;
 
       if (error) {
