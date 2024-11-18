@@ -4,6 +4,7 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
+    "homepage": "https://hericmr.github.io/hell",
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
