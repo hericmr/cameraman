@@ -6,6 +6,10 @@ const Camera = () => {
   const imageRef = useRef<HTMLImageElement | null>(null);
 
   const [currentProxyIndex, setCurrentProxyIndex] = useState(0);
+  const [detectionsData, setDetectionsData] = useState<{ count: number, labels: string[] }>({
+    count: 0,
+    labels: [],
+  });
 
   const PROXIES = [
     "https://corsproxy.io/?", 
@@ -22,9 +26,8 @@ const Camera = () => {
     "https://open-cors-proxy.herokuapp.com/",
   ];
   
-
   const BASE_IMAGE_URL =
-    "https://egov.santos.sp.gov.br/santosmapeada/css/img/cameras/cam0443/snap_c1.jpg?";
+    "https://egov.santos.sp.gov.br/santosmapeada/css/img/cameras/cam0451/snap_c1.jpg?";
 
   useEffect(() => {
     workerRef.current = new Worker(
@@ -33,7 +36,6 @@ const Camera = () => {
     );
 
     workerRef.current.onmessage = (event) => {
-      
       const { status, output, error } = event.data;
 
       if (error) {
@@ -91,6 +93,8 @@ const Camera = () => {
     const canvas = canvasRef.current;
     const ctx = canvas?.getContext("2d");
 
+    let detectedLabels: string[] = [];
+
     if (ctx && canvas) {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
@@ -99,34 +103,51 @@ const Camera = () => {
 
       if (imageRef.current) {
         ctx.drawImage(imageRef.current, 0, 0, width, height);
+
+        // Obter as dimensões da imagem original
+        const imgWidth = imageRef.current.naturalWidth;
+        const imgHeight = imageRef.current.naturalHeight;
+
+        // Calcular o fator de escala para ajustar as coordenadas da detecção
+        const scaleX = width / imgWidth;
+        const scaleY = height / imgHeight;
+
+        detections.forEach((detection) => {
+          const [label, bbox] = detection;
+          const { xmin, xmax, ymin, ymax, confidence } = bbox;
+
+          // Ajuste das coordenadas da caixa delimitadora
+          const adjustedXmin = xmin * scaleX;
+          const adjustedXmax = xmax * scaleX;
+          const adjustedYmin = ymin * scaleY;
+          const adjustedYmax = ymax * scaleY;
+
+          // Desenhar a caixa delimitadora
+          ctx.strokeStyle = "red";
+          ctx.lineWidth = 2;
+          ctx.strokeRect(adjustedXmin, adjustedYmin, adjustedXmax - adjustedXmin, adjustedYmax - adjustedYmin);
+
+          // Texto da classe e confiança
+          ctx.fillStyle = "red";
+          ctx.font = "16px Arial";
+          ctx.fillText(
+            `${label} (${(confidence * 100).toFixed(1)}%)`,
+            adjustedXmin,
+            adjustedYmin - 5
+          );
+
+          // Adicionar o rótulo à lista
+          if (!detectedLabels.includes(label)) {
+            detectedLabels.push(label);
+          }
+        });
+
+        // Atualizar a contagem e os rótulos detectados
+        setDetectionsData({
+          count: detections.length,
+          labels: detectedLabels,
+        });
       }
-
-      detections.forEach((detection) => {
-        const [label, bbox] = detection;
-        const { xmin, xmax, ymin, ymax, confidence } = bbox;
-
-        ctx.strokeStyle = "red";
-        ctx.lineWidth = 2;
-        ctx.strokeRect(xmin, ymin, xmax - xmin, ymax - ymin);
-
-        ctx.fillStyle = "red";
-        ctx.font = "16px Arial";
-        ctx.fillText(
-          `${label} (${(confidence * 100).toFixed(1)}%)`,
-          xmin,
-          ymin - 5
-        );
-
-        if (bbox.keypoints && bbox.keypoints.length > 0) {
-          ctx.fillStyle = "blue";
-          bbox.keypoints.forEach((keypoint: any) => {
-            const { x, y } = keypoint;
-            ctx.beginPath();
-            ctx.arc(x, y, 3, 0, 2 * Math.PI);
-            ctx.fill();
-          });
-        }
-      });
     }
   };
 
@@ -141,22 +162,42 @@ const Camera = () => {
   }, [currentProxyIndex]);
 
   return (
-    <div style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "80vh" }}>
+    <div style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "80vh", position: "relative" }}>
       <img
-      ref={imageRef}
-      alt="Camera"
-      style={{
-        display: "none",
-      }}
+        ref={imageRef}
+        alt="Camera"
+        style={{
+          display: "none",
+        }}
       />
       <canvas
-      ref={canvasRef}
-      style={{
-        width: "50%",
-        height: "auto",
-        zIndex: 2,
-      }}
+        ref={canvasRef}
+        style={{
+          width: "640px",
+          height: "480px",
+          zIndex: 2,
+        }}
       />
+      <div
+        style={{
+          position: "absolute",
+          top: "10px",
+          left: "10px",
+          color: "white",
+          fontSize: "16px",
+          backgroundColor: "rgba(0, 0, 0, 0.5)",
+          padding: "5px",
+          borderRadius: "5px",
+        }}
+      >
+        <p><strong>Objetos Detectados:</strong></p>
+        <p>Quantidade: {detectionsData.count}</p>
+        <ul>
+          {detectionsData.labels.map((label, index) => (
+            <li key={index}>{label}</li>
+          ))}
+        </ul>
+      </div>
     </div>
   );
 };

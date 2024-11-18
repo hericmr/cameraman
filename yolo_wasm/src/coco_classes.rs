@@ -1,5 +1,5 @@
 pub const NAMES: [&str; 80] = [
-    "person",
+    "pessoa",
     "bicycle",
     "car",
     "motorbike",
