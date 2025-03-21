@@ -1,6 +1,6 @@
 import { useState, useCallback } from "react"
 import Webcam from "react-webcam"
-import { YOLOWorker } from "./model/yoloWorker"
+import { YOLOWorker } from "./workers/yoloWorker"
 
 function App() {
   const [isRunning, setIsRunning] = useState(false)
