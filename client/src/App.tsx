@@ -1,5 +1,5 @@
-import "./App.css";
-import Camera from "./components/Camera.tsx";
+import "./App.css"
+import Camera from "./components/Camera.tsx"
 
 function App() {
   return (
@@ -34,7 +34,7 @@ function App() {
         </p>
       </footer>
     </>
-  );
+  )
 }
 
-export default App;
+export default App

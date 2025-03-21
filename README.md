@@ -31,8 +31,8 @@ A vantagem desta configuração é que toda a detecção de objetos acontece loc
 
 1. Clone o repositório
    ```bash
-   git clone https://github.com/hericmr/cameraman
-   cd cameraman
+   git clone https://github.com/hericmr/react-rust-wasm-yolo-object-detection
+   cd react-rust-wasm-yolo-object-detection
    ```
    
 2. Instale as dependências do cliente
