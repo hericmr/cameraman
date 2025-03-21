@@ -1,4 +1,4 @@
-import { useEffect, useRef, useCallback } from "react"
+import { useEffect, useRef, useCallback, useState } from "react"
 import Webcam from "react-webcam"
 
 const videoConstraints = {
@@ -11,6 +11,8 @@ const Camera = () => {
   const webcamRef = useRef<Webcam>(null)
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const workerRef = useRef<Worker | null>(null)
+  const [isRunning, setIsRunning] = useState(true)
+  const [confidence, setConfidence] = useState(0.5)
 
   useEffect(() => {
     workerRef.current = new Worker(new URL("../workers/yoloWorker.js", import.meta.url), {
@@ -27,9 +29,7 @@ const Camera = () => {
 
       if (status === "complete") {
         const detections = JSON.parse(output)
-
-        console.log("Detections from worker: ", detections)
-        drawDetections(detections, 640, 480) // Assuming 640x480 video size
+        drawDetections(detections, 640, 480)
       }
     }
 
@@ -62,17 +62,27 @@ const Camera = () => {
         const [label, bbox] = detection
         const { xmin, xmax, ymin, ymax, confidence } = bbox
 
-        ctx.strokeStyle = "red"
+        // Cores personalizadas para diferentes classes
+        const colors = {
+          person: "#FF0000",
+          car: "#00FF00",
+          dog: "#0000FF",
+          cat: "#FFFF00",
+          default: "#FF00FF"
+        }
+
+        const color = colors[label as keyof typeof colors] || colors.default
+        ctx.strokeStyle = color
         ctx.lineWidth = 2
 
         ctx.strokeRect(xmin, ymin, xmax - xmin, ymax - ymin)
 
-        ctx.fillStyle = "red"
-        ctx.font = "16px Arial"
+        ctx.fillStyle = color
+        ctx.font = "bold 16px Arial"
         ctx.fillText(`${label} (${(confidence * 100).toFixed(1)}%)`, xmin, ymin - 5)
 
         if (bbox.keypoints && bbox.keypoints.length > 0) {
-          ctx.fillStyle = "blue"
+          ctx.fillStyle = "#00FFFF"
           bbox.keypoints.forEach((keypoint: any) => {
             const { x, y } = keypoint
             ctx.beginPath()
@@ -85,23 +95,20 @@ const Camera = () => {
   }
 
   const processFrameWithWorker = useCallback(() => {
-    if (webcamRef.current && workerRef.current) {
+    if (webcamRef.current && workerRef.current && isRunning) {
       const imageSrc = webcamRef.current.getScreenshot({ width: 640, height: 480 })
-      console.log("sending image to worker")
 
       if (imageSrc) {
         const imageData = base64ToUint8Array(imageSrc)
 
         workerRef.current.postMessage({
           imageData,
-          confidence: 0.5,
+          confidence: confidence,
           iouThreshold: 0.5,
         })
-      } else {
-        console.log("Failed to capture image")
       }
     }
-  }, [])
+  }, [isRunning, confidence])
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -111,33 +118,72 @@ const Camera = () => {
   }, [processFrameWithWorker])
 
   return (
-    <>
-      <Webcam
-        ref={webcamRef}
-        audio={false}
-        screenshotFormat="image/jpeg"
-        videoConstraints={videoConstraints}
-        style={{
-          position: "absolute",
-          top: 0,
-          left: 0,
-          width: 640,
-          height: 480,
-          zIndex: 1,
-        }}
-      />
-      <canvas
-        ref={canvasRef}
-        style={{
-          position: "absolute",
-          top: 0,
-          left: 0,
-          width: 640,
-          height: 480,
-          zIndex: 2,
-        }}
-      />
-    </>
+    <div style={{ position: "relative", width: "640px", margin: "0 auto" }}>
+      <div style={{ position: "relative", marginBottom: "20px" }}>
+        <Webcam
+          ref={webcamRef}
+          audio={false}
+          screenshotFormat="image/jpeg"
+          videoConstraints={videoConstraints}
+          style={{
+            width: "100%",
+            height: "auto",
+            borderRadius: "8px",
+            boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
+          }}
+        />
+        <canvas
+          ref={canvasRef}
+          style={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            width: "100%",
+            height: "100%",
+          }}
+        />
+      </div>
+      
+      <div style={{
+        display: "flex",
+        gap: "20px",
+        justifyContent: "center",
+        alignItems: "center",
+        padding: "10px",
+        backgroundColor: "#f5f5f5",
+        borderRadius: "8px",
+        marginTop: "10px"
+      }}>
+        <button
+          onClick={() => setIsRunning(!isRunning)}
+          style={{
+            padding: "8px 16px",
+            backgroundColor: isRunning ? "#ff4444" : "#44ff44",
+            color: "white",
+            border: "none",
+            borderRadius: "4px",
+            cursor: "pointer",
+            fontWeight: "bold"
+          }}
+        >
+          {isRunning ? "Pausar" : "Iniciar"}
+        </button>
+        
+        <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+          <label htmlFor="confidence">Confiança:</label>
+          <input
+            type="range"
+            id="confidence"
+            min="0.1"
+            max="1"
+            step="0.1"
+            value={confidence}
+            onChange={(e) => setConfidence(parseFloat(e.target.value))}
+          />
+          <span>{(confidence * 100).toFixed(0)}%</span>
+        </div>
+      </div>
+    </div>
   )
 }
 

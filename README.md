@@ -1,54 +1,70 @@
+# HericMR - Detecção de Objetos em Tempo Real
 
-# WASM + YOLO Real-time Object Detection
+Este projeto demonstra a detecção de objetos em tempo real diretamente no navegador usando YOLOv8 e WebAssembly (WASM). A interface foi desenvolvida com React.js e integra-se com a webcam para capturar e processar frames de vídeo, enquanto a detecção de objetos é realizada por um módulo Rust compilado em WebAssembly.
 
-This project demonstrates real-time object detection entirely in the browser using YOLOv8 and WebAssembly (WASM). The front-end is built with React.js and integrates with the webcam to capture and process video frames, while the object detection is handled by a Rust module compiled into WebAssembly.
+A vantagem desta configuração é que toda a detecção de objetos acontece localmente no navegador, sem necessidade de um servidor backend, resultando em melhor performance e privacidade do usuário.
 
-The advantage of this setup is that all object detection happens locally in the browser, without the need for a server backend, resulting in better performance and user privacy.
+## Características
 
-[Check out the live version here](https://object-detection.martishin.com/)!
+- Detecção de objetos em tempo real usando YOLOv8
+- Interface moderna e responsiva
+- Controles de confiança ajustáveis
+- Cores diferentes para diferentes tipos de objetos
+- Botão de pausar/iniciar para controle do processamento
+- Processamento totalmente local no navegador
 
-<details>
-<summary>Demo</summary>
-<img src="https://i.giphy.com/media/v1.Y2lkPTc5MGI3NjExcWw2cHFycnAwbHJ2dzhma2ZieWc4OHpkdXk0dDYxdWZhNm95aWZuNiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/8uwQcYcTHGawVJrvXz/giphy.gif" width="500"/>
-</details>
+## Tecnologias Utilizadas
 
-## Running Locally
+- **React (Cliente)** - para captura de frames de vídeo e exibição dos resultados
+- **Rust (WASM)** - para detecção de objetos em tempo real usando WASM e modelo YOLOv8
+- **Candle ML** - framework minimalista de machine learning em Rust
+- **YOLOv8** - modelo de detecção de objetos state-of-the-art
 
-### Prerequisites
+## Executando Localmente
 
-- [Node.js & npm](https://nodejs.org/en/download/package-manager) - for the React client
-- [Rust](https://www.rust-lang.org/tools/install) - for the WebAssembly module
+### Pré-requisitos
 
-### Steps
+- [Node.js & npm](https://nodejs.org/en/download/package-manager) - para o cliente React
+- [Rust](https://www.rust-lang.org/tools/install) - para o módulo WebAssembly
 
-1. Clone the repository
+### Passos
+
+1. Clone o repositório
    ```bash
-   git clone https://github.com/martishin/react-rust-wasm-yolo-object-detection
+   git clone https://github.com/hericmr/react-rust-wasm-yolo-object-detection
    cd react-rust-wasm-yolo-object-detection
    ```
    
-2. Install client dependencies
+2. Instale as dependências do cliente
    ```bash
    cd client
    npm install
    ```
 
-3. Running the React client  
+3. Execute o cliente React
    ```bash
    npm run dev
    ```
 
-   The client will be running at `http://localhost:5173/`
-4. If you want to rebuild WASM module
+   O cliente estará rodando em `http://localhost:5173/`
+
+4. Se você quiser recompilar o módulo WASM
    ```bash
    cd yolo_wasm
    make build
-    ```
-   Compiled module will be placed into `client/src/model`
+   ```
+   O módulo compilado será colocado em `client/src/model`
 
-## Technologies Used
+## Controles
 
-- **React (Client)** - for capturing video frames and displaying object detection results
-- **Rust (WASM)** - for real-time object detection using WASM and YOLOv8 model
-- **Candle ML** - minimalist Rust machine learning framework, used for reimplementing the YOLOv8 model
-- **YOLOv8** - state-of-the-art object detection model. Only the pre-trained weights (in safetensors format) are used
+- Use o botão "Pausar/Iniciar" para controlar o processamento
+- Ajuste o controle deslizante de confiança para controlar a sensibilidade da detecção
+- Diferentes objetos são destacados com cores diferentes para melhor visualização
+
+## Licença
+
+Este projeto está sob a licença MIT. Veja o arquivo [LICENSE](LICENSE) para mais detalhes.
+
+## Autor
+
+- **HericMR** - [GitHub](https://github.com/hericmr)
