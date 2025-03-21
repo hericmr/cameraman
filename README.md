@@ -1,4 +1,4 @@
-# HericMR - Detecção de Objetos em Tempo Real
+# Detecção de Objetos em Tempo Real
 
 Este projeto demonstra a detecção de objetos em tempo real diretamente no navegador usando YOLOv8 e WebAssembly (WASM). A interface foi desenvolvida com React.js e integra-se com a webcam para capturar e processar frames de vídeo, enquanto a detecção de objetos é realizada por um módulo Rust compilado em WebAssembly.
 
