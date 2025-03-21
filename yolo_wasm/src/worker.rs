@@ -15,19 +15,16 @@ extern "C" {
 
 #[macro_export]
 macro_rules! console_log {
-    // Note that this is using the `log` function imported above during
-    // `bare_bones`
+
     ($($t:tt)*) => ($crate::worker::log(&format_args!($($t)*).to_string()))
 }
 
-// Communication to the worker happens through bincode, the model weights and configs are fetched
-// on the main thread and transferred via the following structure.
 #[derive(Serialize, Deserialize)]
 pub struct ModelData {
     pub weights: Vec<u8>,
     pub model_size: String,
 }
-
+//essa bosta de model_size é um enum, mas não consegui fazer funcionar
 #[derive(Serialize, Deserialize)]
 pub struct RunData {
     pub image_data: Vec<u8>,
